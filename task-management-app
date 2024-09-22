@@ -1,0 +1,197 @@
+import tkinter as tk
+from tkinter import ttk
+from tkcalendar import Calendar
+
+# General variables to store button colors and themes
+button_color = "#666666"  # Default button color
+button_text_color = "white"  # Default button text color
+font_color = "black"  # Default font color for light mode
+active_button = None  # Track the active button for resetting styles
+
+# Function to apply theme (Light or Dark mode)
+def apply_theme():
+    """Apply light or dark theme based on the selected mode."""
+    global button_color, button_text_color, font_color
+    if theme_var.get() == "Dark Mode":
+        # Dark mode settings
+        bg_color = "#333333"
+        fg_color = "white"
+        button_bg = "#555555"
+        sidebar_bg = "#444444"
+        topbar_bg = "#555555"
+    else:
+        # Light mode settings
+        bg_color = "#f0f0f0"
+        fg_color = "black"
+        button_bg = "#666666"
+        sidebar_bg = "#e0e0e0"
+        topbar_bg = "#dcdcdc"
+
+    # Apply theme to all frames and widgets
+    root.config(bg=bg_color)
+    sidebar.config(bg=sidebar_bg)
+    main_area.config(bg=bg_color)
+    calendar_frame.config(bg=bg_color)
+    tasks_frame.config(bg=bg_color)
+    categories_frame.config(bg=bg_color)
+    tracking_frame.config(bg=bg_color)
+    add_task_frame.config(bg=bg_color)
+    settings_frame.config(bg=bg_color)
+    task_title_frame.config(bg=bg_color)
+    theme_frame.config(bg=bg_color)
+    
+    task_manager_label.config(bg=sidebar_bg, fg=fg_color)
+    theme_label.config(bg=bg_color, fg=fg_color)
+    add_task_label.config(bg=bg_color, fg=fg_color)
+
+    topbar.config(bg=topbar_bg)
+
+    # Update headers in each section
+    tasks_header.config(bg=bg_color, fg=fg_color)
+    categories_header.config(bg=bg_color, fg=fg_color)
+    tracking_header.config(bg=bg_color, fg=fg_color)
+
+    # Apply theme to buttons and reset styles
+    reset_button_styles(button_bg, fg_color)
+
+# Function to reset button styles to default
+def reset_button_styles(button_bg, fg_color):
+    for btn in buttons:
+        btn.config(bg=button_bg, fg=fg_color, font=("Arial", 10, "bold"), relief="raised")
+
+# Function to show a specific frame and highlight the corresponding button
+def show_frame(frame, button=None):
+    """Display the selected frame and update the button style."""
+    for f in frames.values():
+        f.pack_forget()
+    frame.pack(expand=True, fill="both")
+    reset_button_styles(button_color, button_text_color)
+
+    # Track the previously clicked button
+    global active_button
+    if active_button:
+        active_button.config(bg=button_color, fg=button_text_color, relief="raised")  # Reset the previous button
+    if button:
+        button.config(bg="#cccccc", relief="sunken")  # Highlight the active button
+        active_button = button  # Store reference to current button
+
+    if frame == main_area:
+        show_main_page_widgets()
+
+# Function to display the widgets on the main dashboard page
+def show_main_page_widgets():
+    calendar_frame.place(relx=0.05, rely=0.05, relwidth=0.4, relheight=0.4)
+    tasks_frame.place(relx=0.55, rely=0.05, relwidth=0.4, relheight=0.4)
+    categories_frame.place(relx=0.05, rely=0.55, relwidth=0.4, relheight=0.4)
+    tracking_frame.place(relx=0.55, rely=0.55, relwidth=0.4, relheight=0.4)
+
+# Create the main application window
+root = tk.Tk()
+root.title("Task Management App")
+root.geometry("800x600")
+
+# Sidebar for navigation
+sidebar = tk.Frame(root, bg="#e0e0e0", width=150)
+sidebar.pack(side="left", fill="y")
+
+# Add sidebar buttons for navigation
+task_manager_label = tk.Label(sidebar, text="Task Manager", bg="#e0e0e0", font=("Arial", 14, "bold"))
+task_manager_label.pack(pady=10)
+dashboard_btn = tk.Button(sidebar, text="Dashboard", width=15, command=lambda: show_frame(main_area, dashboard_btn), bg=button_color, fg=button_text_color, font=("Arial", 10, "bold"))
+dashboard_btn.pack(pady=5)
+tasks_btn = tk.Button(sidebar, text="My Tasks", width=15, command=lambda: show_frame(tasks_frame, tasks_btn), bg=button_color, fg=button_text_color, font=("Arial", 10, "bold"))
+tasks_btn.pack(pady=5)
+notifications_btn = tk.Button(sidebar, text="Notifications", width=15, command=lambda: show_frame(tracking_frame, notifications_btn), bg=button_color, fg=button_text_color, font=("Arial", 10, "bold"))
+notifications_btn.pack(pady=5)
+
+# Add space for settings and logout buttons
+bottom_frame = tk.Frame(sidebar, bg="#e0e0e0")
+bottom_frame.pack(side="bottom", fill="x")
+settings_btn = tk.Button(bottom_frame, text="Settings", width=15, command=lambda: show_frame(settings_frame, settings_btn), bg=button_color, fg=button_text_color, font=("Arial", 10, "bold"))
+settings_btn.pack(pady=5)
+log_out_btn = tk.Button(bottom_frame, text="Log Out", width=15, bg=button_color, fg=button_text_color, font=("Arial", 10, "bold"))
+log_out_btn.pack(pady=5)
+
+# Top bar frame for "Log In" and "+ Add Task"
+topbar = tk.Frame(root, bg="#dcdcdc", height=50)
+topbar.pack(side="top", fill="x")
+user_button = tk.Button(topbar, text="Log In", bg=button_color, fg=button_text_color, width=15, relief="raised", font=("Arial", 10, "bold"))
+user_button.pack(side="right", padx=10)
+add_task_btn = tk.Button(topbar, text="+ Add Task", bg=button_color, fg=button_text_color, width=15, relief="raised", font=("Arial", 10, "bold"), command=lambda: show_frame(add_task_frame, add_task_btn))
+add_task_btn.pack(side="right", padx=10)
+
+# List of buttons for resetting styles
+buttons = [dashboard_btn, tasks_btn, notifications_btn, settings_btn, add_task_btn, user_button]
+
+# Main content area for the dashboard
+main_area = tk.Frame(root, bg="#f0f0f0")
+main_area.pack(expand=True, fill="both")
+
+# Calendar widget on the main dashboard page
+calendar_frame = tk.Frame(main_area, bg="#ffffff", bd=1, relief="solid")
+cal = Calendar(calendar_frame, selectmode='day', year=2024, month=9, day=14)
+cal.pack(expand=True, fill="both")
+
+# Subframes for tasks, categories, and status
+tasks_frame = tk.Frame(main_area, bg="#ffffff", bd=1, relief="solid")
+categories_frame = tk.Frame(main_area, bg="#ffffff", bd=1, relief="solid")
+tracking_frame = tk.Frame(main_area, bg="#ffffff", bd=1, relief="solid")
+
+# Section headers in the main dashboard
+tasks_header = tk.Label(tasks_frame, text="My Tasks", font=("Arial", 12, "bold"), anchor="center", bg="#f2f2f2")
+tasks_header.pack(fill="x")
+tasks_table = tk.Listbox(tasks_frame, borderwidth=0)
+tasks_table.pack(expand=True, fill="both")
+
+categories_header = tk.Label(categories_frame, text="My Categories", font=("Arial", 12, "bold"), anchor="center", bg="#f2f2f2")
+categories_header.pack(fill="x")
+categories_table = tk.Listbox(categories_frame, borderwidth=0)
+categories_table.pack(expand=True, fill="both")
+
+tracking_header = tk.Label(tracking_frame, text="Status", font=("Arial", 12, "bold"), anchor="center", bg="#f2f2f2")
+tracking_header.pack(fill="x")
+tracking_table = tk.Listbox(tracking_frame, borderwidth=0)
+tracking_table.pack(expand=True, fill="both")
+
+# + Add Task page
+add_task_frame = tk.Frame(root, bg="#f0f0f0")
+
+# Add a smaller label to the Add Task page, left-aligned
+task_title_frame = tk.Frame(add_task_frame, bg="#f0f0f0")
+task_title_frame.pack(fill="x", padx=20, pady=10)
+add_task_label = tk.Label(task_title_frame, text="Add New Task", font=("Arial", 12, "bold"), anchor="w", bg="#f0f0f0", fg="black")
+add_task_label.pack(side="left")
+
+# Settings page
+settings_frame = tk.Frame(root, bg="#f0f0f0")
+
+# Theme selection dropdown
+theme_frame = tk.Frame(settings_frame, bg="#f0f0f0")
+theme_frame.pack(pady=10, padx=10, anchor="w")
+
+theme_label = tk.Label(theme_frame, text="Select Mode:", font=("Arial", 12), bg="#f0f0f0", fg="black")
+theme_label.pack(side="left", padx=(0, 10))
+
+theme_var = tk.StringVar(value="Light Mode")
+theme_dropdown = ttk.Combobox(theme_frame, textvariable=theme_var, values=["Light Mode", "Dark Mode"])
+theme_dropdown.pack(side="left")
+
+# Apply theme button
+apply_theme_button = tk.Button(settings_frame, text="Apply Theme", font=("Arial", 12), command=apply_theme, bg=button_color, fg=button_text_color)
+apply_theme_button.pack(pady=20)
+
+# Frames dictionary for page navigation
+frames = {
+    'main': main_area,
+    'tasks': tasks_frame,
+    'categories': categories_frame,
+    'tracking': tracking_frame,
+    'add_task': add_task_frame,  # + Add Task frame
+    'settings': settings_frame,  # Settings frame
+}
+
+# Show the main frame
+show_frame(main_area)
+
+# Start the application
+root.mainloop()

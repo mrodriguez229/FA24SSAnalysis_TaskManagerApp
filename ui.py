@@ -93,6 +93,18 @@ class TaskInputFrame(tk.Frame):
         """
         self.controller.apply_theme_to_widgets(theme, self.task_title_label, self.task_desc_label, self.task_category_label, self.task_due_date_label, self.task_priority_label, self.task_status_label, self.create_task_button)
 
+    def is_valid_date(self, date_str):
+        """
+        Validates if the date string is in the correct format (MM/DD/YY).
+        Returns True if valid, False otherwise.
+        """
+        try:
+            # Ensure the date follows the correct format
+            datetime.datetime.strptime(date_str, '%m/%d/%y')
+            return True
+        except ValueError:
+            return False
+    
     def create_task(self):
         """
         Gathers task input data and attempts to create a new task in the system.
@@ -111,6 +123,9 @@ class TaskInputFrame(tk.Frame):
             return
         if not task_due_date:
             messagebox.showerror("Input Error", "Due date cannot be empty!")
+            return
+        if not self.is_valid_date(task_due_date):
+            messagebox.showerror("Input Error", "Invalid date format. Please use MM/DD/YY. Example: 12/31/24.")
             return
         if not task_category:
             messagebox.showerror("Input Error", "Please select a category.")
